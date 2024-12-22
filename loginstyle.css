@@ -1,0 +1,107 @@
+*{
+    font-family: sans-serif;
+    box-sizing: border-box;
+}
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 88vh;
+    background: url(image/back.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+.box{
+    margin-top: 50px;
+    width: 350px;
+    height: 600px;
+    background: url(image/black.jpg);
+    opacity: 65%;
+    border-radius: 70px;
+}
+.alert {
+    position: absolute;
+    margin-left: 20px;
+    margin-top: 30px;
+    padding-top: 5px;
+    color: white;
+    width: 300px;
+    height: 30px;
+    text-align: center;
+    background-color: rgb(255, 0, 0);
+    border-radius: 8px;
+    font-weight: 600;
+    display: none;
+}
+.box h1 {
+    position: absolute;
+    color: white;
+    margin-top: 50px;
+    margin-left: 58px;
+}
+.input {
+    color:white;
+    margin-left: 50px;
+    font-size: 15px;
+    margin-top: 20px;
+}
+.input input {
+    width: 250px;
+    height: 55px;
+    border-radius: 15px;
+    background-color: rgb(77, 74, 74);
+    padding-left: 20px;
+    border: 1px ;
+    color: white;
+    margin-top: 15px;
+}
+::placeholder {
+    color: white;
+    opacity: 70%;
+}
+button {
+    width: 250px;
+    height: 55px;
+    margin-top: 20px;
+    margin-left: 50px;
+    border-radius: 15px;
+    border: 3px solid white;
+    background-color: black;
+    color: white;
+}
+.logo span{
+    color: white;
+    font-size: 20px;
+    margin-left: 135px;
+    position: absolute;
+    margin-top: 100px;
+}
+.logo img {
+    position: absolute;
+    width: 230px;
+    height: 220px;
+    margin-left: 50px;
+    margin-top: 10px;
+}
+.msg {
+    color: white;
+    position: absolute;
+    margin-top: 90px;
+    margin-left: 60px;
+}
+.head {
+    margin-bottom: 160px;
+}
+.login {
+    padding: px;
+    font-size: 16px;
+    color: white;
+    background-color:black;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+.login:active {
+    transform: scale(0.90);
+}

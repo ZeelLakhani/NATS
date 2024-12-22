@@ -1,0 +1,120 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 88vh;
+    background: url(image/homeback.jpg);
+    background-size: cover;
+    flex-direction: column;
+}
+
+.top {
+    width: 1000px;
+    height: 80px;
+    border-radius: 25px;
+    background-color: white;
+    margin-bottom: 30px;
+    border: 1px solid black;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.logo {
+    width: 150px;
+    height: 50px;
+    padding-top: 14px;
+    padding-left: 20px;
+}
+
+.search {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    margin-left: 135px;
+    margin-top: 25px;
+}
+
+.searchbar {
+    position: absolute;
+    width: 350px;
+    height: 40px;
+    border-radius: 30px;
+    padding-left: 55px;
+    margin-top: 18px;
+    font-size: 20px;
+    margin-left: 120px;
+}
+
+.menu {
+    position: absolute;
+    display: inline-block;
+    margin-left: 750px;
+    margin-top: 14px;
+}
+
+.menu-icon {
+    cursor: pointer;
+    font-size: 24px;
+    padding: 10px;
+    background-color: white;
+    color: black;
+    border-radius: 5px;
+}
+
+.dropdown {
+    display: none;
+    /* Hidden by default */
+    position: absolute;
+    background-color: white;
+    border-radius: 10px;
+    min-width: 160px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    z-index: 1;
+}
+
+.dropdown-item {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-item:hover {
+    background-color: #f1f1f1;
+}
+
+.unwanted {
+    display: none;
+}
+
+table {
+    border: 1px solid black;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    background-color: white;
+    width: 1000px;
+    padding: 20px;
+    text-align: center;
+    border-radius: 30px;
+}
+
+th {
+    font-size: 25px;
+    font-weight: bolder;
+    padding-bottom: 20px;
+}
+
+td {
+    font-size: 20px;
+    padding-bottom: 10px;
+}
+
+.present {
+    color: rgb(15, 212, 15);
+}
+
+.absent {
+    color: red;
+}
+
+.late {
+    color: rgb(255, 196, 0);
+}

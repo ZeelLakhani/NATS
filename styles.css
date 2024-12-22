@@ -1,0 +1,146 @@
+video {
+    position: absolute;
+    min-width: 100%;
+    min-height: 100%;
+    object-fit: cover;
+    width: auto;
+    height: auto;
+    z-index: -1;
+    /* Place video behind other content */
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 90vh;
+}
+
+.top {
+    background-color: #d1d1d1;
+    width: 1100px;
+    height: 80px;
+    border-radius: 25px;
+    opacity: 80%;
+    margin-bottom: 40px;
+    z-index: -1;
+}
+
+.container {
+    display: flex;
+    position: absolute;
+    margin-bottom: 265px;
+    width: 1100px;
+    padding-left: 40px;
+}
+
+.logo {
+    width: 220px;
+    height: 60px;
+}
+
+.search {
+    position: absolute;
+    margin-top: 16px;
+    padding-left: 380px;
+    width: 25px;
+    height: 25px;
+}
+
+.searchbar {
+    margin-top: 8px;
+    margin-left: 150px;
+    width: 300px;
+    height: 35px;
+    border-radius: 30px;
+    padding-left: 45px;
+    font-size: 20px;
+}
+
+/* .menu {
+    margin-top: 12px;
+    margin-left: 300px;
+    width: 30px;
+    height: 30px;
+} */
+.menu {
+    position: relative;
+    display: inline-block;
+}
+
+.menu-icon {
+    cursor: pointer;
+    font-size: 24px;
+    padding: 10px;
+    background-color: #007BFF;
+    color: white;
+    border-radius: 5px;
+}
+
+.dropdown {
+    display: none;
+    /* Hidden by default */
+    position: absolute;
+    background-color: white;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+.dropdown-item {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-item:hover {
+    background-color: #f1f1f1;
+}
+
+.table {
+    border-radius: 20px;
+    background-color: #d1d1d1;
+    text-align: center;
+    opacity: 80%;
+    border-collapse: collapse;
+    width: 1100px;
+    height: 230px;
+}
+
+table {
+    padding-top: 120px;
+    position: absolute;
+    align-content: center;
+    text-align: center;
+}
+
+th {
+    font-size: 23px;
+    padding: 40px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: white;
+    font-weight: 100px;
+    border-radius: 15px;
+}
+
+td {
+
+    font-size: 20px;
+    background-color: white;
+    padding: 5px;
+}
+
+.present {
+    color: rgb(15, 212, 15);
+}
+
+.absent {
+    color: red;
+}
+
+.late {
+    color: rgb(255, 196, 0);
+}

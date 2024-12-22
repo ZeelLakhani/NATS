@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title> NATS </title>
+    <link rel="stylesheet" href="loginstyle.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <div class="box">
+
+        <div class="head">
+            <h1> Welcome Back, </h1>
+            <span class="msg"> Log in to continue.</span>
+        </div>
+
+        <div class="input">
+            <span> Email </span> <br>
+            <input type="email" id="email" placeholder="Enter Email">
+        </div>
+
+        <div class="input">
+            <span> Password</span>
+            <input type="password" id="password" placeholder="Enter Password">
+        </div>
+
+        <div class="login">
+            <button id="login">Log In</button>
+            <div class="alert">Email or Password is incorrect!</div>
+        </div>
+
+        <div class="logo">
+            <span> Powerd by</span> <br>
+            <img src="image/logo.png">
+        </div>
+    </div>
+</body>
+
+<script type="module">
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+    import { getDatabase } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCUJ97PpUz3nrok_Sdd6KOBvQ_BAOq_ESU",
+        authDomain: "tracker-22dd1.firebaseapp.com",
+        databaseURL: "https://tracker-22dd1-default-rtdb.firebaseio.com",
+        projectId: "tracker-22dd1",
+        storageBucket: "tracker-22dd1.appspot.com",
+        messagingSenderId: "730210191811",
+        appId: "1:730210191811:web:01a120d39c8783b5265576",
+        measurementId: "G-9Z9SHRGQQ3"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    const auth = getAuth();
+
+    // Login auth
+    const Authentication = () => {
+
+        var Email = document.getElementById('email').value;
+        var Password = document.getElementById('password').value;
+
+        signInWithEmailAndPassword(auth, Email, Password)
+            .then((userCredential) => {
+
+                const user = userCredential.user;
+                window.location.href = 'homepage.html';
+
+            })
+            .catch(() => {
+
+                //enable alert
+                document.querySelector('.alert').style.display = "block";
+
+                //timer for alert
+                setTimeout(() => {
+                    document.querySelector('.alert').style.display = "none";
+                }, 2000);
+            });
+    };
+
+    const AuthEnter = event => {
+        if (event.keyCode === 13)
+            Authentication();
+    }
+
+    email.addEventListener('blur', function () {
+        let value = this.value;
+
+        const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (value.length < 1) {
+            this.setCustomValidity('Please Enter Your Email');
+            this.reportValidity();
+        }
+        else if (!re.test(value)) {
+            this.setCustomValidity('Please Enter Valid Email');
+            this.reportValidity();
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+    password.addEventListener('blur', function () {
+        let value = this.value;
+
+        if (value.length < 1) {
+            this.setCustomValidity('Please Enter Your Password');
+            this.reportValidity();
+        }
+        else if (value.length < 8) {
+            this.setCustomValidity('Password mst be at least 8 character long');
+            this.reportValidity();
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+
+    login.addEventListener('click', Authentication);
+    email.addEventListener('keypress', AuthEnter);
+    password.addEventListener('keypress', AuthEnter);
+
+</script>
+
+</html>

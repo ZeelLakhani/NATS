@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title> Attendence Management </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div>
+        <input type="text" id="searchbar1" placeholder="Search by ID or Name">
+        <input type="text" id="searchbar2" placeholder="Search by Date">
+    </div>
+    <table>
+        <thead>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Date</th>
+            <th>Lecture 1</th>
+            <th>Lecture 2</th>
+            <th>Lecture 3</th>
+            <th>Lecture 4</th>
+            <th>Lecture 5</th>
+            <th>Lecture 6</th>
+            <th>Overall Present</th>
+            <th>Overall Late</th>
+            <th>Overall Absent</th>
+        </thead>
+        <tbody id="tbody1">
+
+        </tbody>
+    </table>
+    <canvas id="attendanceChart" width="400" height="200"></canvas>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
+        import { getDatabase, ref, set, get, child, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCUJ97PpUz3nrok_Sdd6KOBvQ_BAOq_ESU",
+            authDomain: "tracker-22dd1.firebaseapp.com",
+            databaseURL: "https://tracker-22dd1-default-rtdb.firebaseio.com",
+            projectId: "tracker-22dd1",
+            storageBucket: "tracker-22dd1.firebasestorage.app",
+            messagingSenderId: "730210191811",
+            appId: "1:730210191811:web:01a120d39c8783b5265576",
+            measurementId: "G-9Z9SHRGQQ3"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getDatabase();
+
+        // Function to render the chart for a specific student
+        const renderChart = (student) => {
+            const ctx = document.getElementById('attendanceChart').getContext('2d');
+
+            // Count attendance status
+            const attendanceStatus = ["Absent", "Absent", "Absent", "Absent", "Absent", "Absent"];
+            student.Times.forEach(Time => {
+                let [hours, minutes] = Time.split(":").map(Number);
+                if (hours === 8 && minutes >= 10 && minutes < 40) attendanceStatus[0] = "Present";
+                else if (hours === 8 && minutes >= 40) attendanceStatus[0] = "Late";
+                else if (hours === 9 && minutes >= 0 && minutes < 30) attendanceStatus[1] = "Present";
+                else if (hours === 9 && minutes >= 30) attendanceStatus[1] = "Late";
+                else if (hours === 9 && minutes >= 50) attendanceStatus[2] = "Present";
+                else if (hours === 10 && minutes < 20) attendanceStatus[2] = "Present";
+                else if (hours === 10 && minutes >= 20) attendanceStatus[2] = "Late";
+                else if (hours === 10 && minutes >= 40) attendanceStatus[3] = "Present";
+                else if (hours === 11 && minutes < 10) attendanceStatus[3] = "Present";
+                else if (hours === 11 && minutes >= 10) attendanceStatus[3] = "Late";
+                else if (hours === 12 && minutes < 30) attendanceStatus[4] = "Present";
+                else if (hours === 12 && minutes >= 30) attendanceStatus[4] = "Late";
+                else if (hours === 12 && minutes >= 50) attendanceStatus[5] = "Present";
+                else if (hours === 13 && minutes < 20) attendanceStatus[5] = "Present";
+                else if (hours === 13 && minutes >= 20) attendanceStatus[5] = "Late";
+            });
+
+            const presentCount = attendanceStatus.filter(status => status === "Present").length;
+            const lateCount = attendanceStatus.filter(status => status === "Late").length;
+            const absentCount = attendanceStatus.filter(status => status === "Absent").length;
+
+            // Create the chart
+            const attendanceChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Present', 'Late', 'Absent'],
+                    datasets: [{
+                        label: 'Attendance Status',
+                        data: [presentCount, lateCount, absentCount],
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(255, 99, 132, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(255, 99, 132, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        };
+
+        // Fetch data in table
+        let studentlist = [];
+
+        const AddAllRecordsGroupedByIDAndDate = () => {
+            const groupedData = {};
+
+            // Group records by ID and Date
+            studentlist.forEach(student => {
+                const key = `${student.ID}-${student.Date}`; // Create a unique key for each ID-Date combination
+                if (!groupedData[key]) {
+                    groupedData[key] = {
+                        ID: student.ID,
+                        Name: student.Name,
+                        ParentEmail: student.ParentEmail,
+                        date: student.Date,
+                        Times: []
+                    };
+                }
+                groupedData[key].Times.push(student.Time);
+            });
+
+            // Assuming you want to render the chart for a specific student
+            const specificStudent = groupedData['2227010601111-02-12-2024']; // Replace with actual student ID and date
+            if (specificStudent) {
+                renderChart(specificStudent);
+            }
+
+            tbody1.innerHTML = ""; // Clear previous records
+
+            // Add grouped records to the table
+            for (const key in groupedData) {
+                const { ID, Name, ParentEmail, date, Times } = groupedData[key];
+                let trow = document.createElement('tr');
+                let td1 = document.createElement('td');
+                let td2 = document.createElement('td');
+                let td3 = document.createElement('td');
+                let td4 = document.createElement('td');
+                let td5 = document.createElement('td');
+                let td6 = document.createElement('td');
+                let td7 = document.createElement('td');
+                let td8 = document.createElement('td');
+                let td9 = document.createElement('td');
+                let td10 = document.createElement('td');
+                let td11 = document.createElement('td');
+                let td12 = document.createElement('td');
+
+                td1.innerHTML = ID;
+                td2.innerHTML = Name;
+                td3.innerHTML = date;
+                td4.innerHTML = "<span class='absent'>Absent</span>";
+                td5.innerHTML = "<span class='absent'>Absent</span>";
+                td6.innerHTML = "<span class='absent'>Absent</span>";
+                td7.innerHTML = "<span class='absent'>Absent</span>";
+                td8.innerHTML = "<span class='absent'>Absent</span>";
+                td9.innerHTML = "<span class='absent'>Absent</span>";
+
+                // Initialize attendance status
+                let attendanceStatus = ["Absent", "Absent", "Absent", "Absent", "Absent", "Absent"];
+
+                // Process each time entry to determine attendance status
+                Times.map(Time => {
+                    let [hours, minutes] = Time.split(":").map(Number);
+
+                    //lecture 1
+                    if (hours === 8 && minutes >= 10 && minutes < 40) {
+                        td4.innerHTML = "<span class='present'>Present</span>";
+                        attendanceStatus[0] = "Present";
+                    }
+                    else if (hours === 8 && minutes >= 40 && minutes < 60) {
+                        td4.innerHTML = "<span class='late'>Late</span>";
+                        attendanceStatus[0] = "Late";
+                    }
+
+                    //lecture 2
+                    else if (hours === 9 && minutes >= 0 && minutes < 30) {
+                        td5.innerHTML = "<span class='present'>Present</span>";
+                        attendanceStatus[1] = "Present";
+                    }
+                    else if (hours === 9 && minutes >= 30 && minutes < 50) {
+                        td5.innerHTML = "<span class='late'>Late</span>";
+                        attendanceStatus[1] = "Late";
+                    }
+
+                    //lecture 3
+                    else if (hours === 9 && minutes >= 50) {
+                        td6.innerHTML = "<span class='present'>Present</span>";
+                        attendanceStatus[2] = "Present";
+                    }
+                    else if (hours === 10 && minutes < 20) {
+                        td6.innerHTML = "<span class='present'>Present</span>";
+                        attendanceStatus[2] = "Present";
+                    }
+                    else if (hours === 10 && minutes >= 20 && minutes < 40) {
+                        td6.innerHTML = "<span class='late'>Late</span>";
+                        attendanceStatus[2] = "Late";
+                    }
+
+                    //lecture 4
+                    else if (hours === 10 && minutes >= 40) {
+                        td7.innerHTML = "<span class='present'>Present</span>";
+                        attendanceStatus[3] = "Present";
+                    }
+                    else if (hours === 11 && minutes < 10) {
+                        td7.innerHTML = "<span class='present'>Present</span>";
+                        attendanceStatus[3] = "Present";
+                    }
+                    else if (hours === 11 && minutes >= 10 && minutes < 30) {
+                        td7.innerHTML = "<span class='late'>Late</span>";
+                        attendanceStatus[3] = "Late";
+                    }
+
+                    //lecture 5
+                    else if (hours === 12 && minutes >= 0 && minutes < 30) {
+                        td8.innerHTML = "<span class='present'>Present</span>";
+                        attendanceStatus[4] = "Present";
+                    }
+                    else if (hours === 12 && minutes >= 30 && minutes < 50) {
+                        td8.innerHTML = "<span class='late'>Late</span>";
+                        attendanceStatus[4] = "Late";
+                    }
+
+                    //lecture 6
+                    else if (hours === 12 && minutes >= 50) {
+                        td9.innerHTML = "<span class='present'>Present</span>";
+                        attendanceStatus[5] = "Present";
+                    }
+                    else if (hours === 13 && minutes < 20) {
+                        td9.innerHTML = "<span class='present'>Present</span>";
+                        attendanceStatus[5] = "Present";
+                    }
+                    else if (hours === 13 && minutes >= 20 && minutes < 40) {
+                        td9.innerHTML = "<span class='late'>Late</span>";
+                        attendanceStatus[5] = "Late";
+                    }
+                });
+
+                const presentCount = attendanceStatus.filter(status => status === "Present").length;
+                const lateCount = attendanceStatus.filter(status => status === "Late").length;
+                const absentCount = attendanceStatus.filter(status => status === "Absent").length;
+
+                td10.innerHTML = presentCount;
+                td11.innerHTML = lateCount;
+                td12.innerHTML = absentCount;
+
+                trow.append(td1, td2, td3, td4, td5, td6, td7, td8, td9, td10, td11, td12);
+                tbody1.append(trow);
+
+            }
+        }
+
+        const SelectAllDataRealtime = () => {
+            const dbRef = ref(db, 'data');
+            onValue(dbRef, (snapshot) => {
+                studentlist = [];
+                snapshot.forEach(student => {
+                    studentlist.push(student.val());
+                });
+                AddAllRecordsGroupedByIDAndDate();
+            });
+        }
+
+        //Search filter
+        let filteredData = [];
+        let searchbar1 = document.getElementById('searchbar1');
+        let searchbar2 = document.getElementById('searchbar2');
+
+        const FilterRecords = () => {
+            let searchval1 = searchbar1.value.toLowerCase().trim();
+            let searchval2 = searchbar2.value.toLowerCase().trim();
+
+            filteredData = studentlist.filter(s => {
+                const matchesFirstSearch = s.ID.toString().toLowerCase().trim().includes(searchval1) ||
+                    s.Name.toString().toLowerCase().trim().includes(searchval1);
+                const matchesSecondSearch = s.Date.toString().toLowerCase().trim().includes(searchval2);
+
+                return (searchval1.length > 0 ? matchesFirstSearch : true) &&
+                    (searchval2.length > 0 ? matchesSecondSearch : true);
+            });
+
+            // Now we need to group the filtered records
+            const groupedFilteredData = {};
+
+            filteredData.forEach(student => {
+                const key = `${student.ID}-${student.Date}`; // Create a unique key for each ID-Date combination
+                if (!groupedFilteredData[key]) {
+                    groupedFilteredData[key] = {
+                        ID: student.ID,
+                        Name: student.Name,
+                        date: student.Date,
+                        ParentEmail: student.ParentEmail,
+                        Times: []
+                    };
+                }
+                groupedFilteredData[key].Times.push(student.Time);
+            });
+
+            // Clear previous records and add filtered records
+            tbody1.innerHTML = ""; // Clear previous records
+            for (const key in groupedFilteredData) {
+                const { ID, Name, ParentEmail, date, Times } = groupedFilteredData[key];
+                let trow = document.createElement('tr');
+                let td1 = document.createElement('td');
+                let td2 = document.createElement('td');
+                let td3 = document.createElement('td');
+                let td4 = document.createElement('td');
+                let td5 = document.createElement('td');
+                let td6 = document.createElement('td');
+                let td7 = document.createElement('td');
+                let td8 = document.createElement('td');
+                let td9 = document.createElement('td');
+
+                td1.innerHTML = ID;
+                td2.innerHTML = Name;
+                td3.innerHTML = date;
+                td4.innerHTML = "<span class='absent'>Absent</span>";
+                td5.innerHTML = "<span class='absent'>Absent</span>";
+                td6.innerHTML = "<span class='absent'>Absent</span>";
+                td7.innerHTML = "<span class='absent'>Absent</span>";
+                td8.innerHTML = "<span class='absent'>Absent</span>";
+                td9.innerHTML = "<span class='absent'>Absent</span>";
+
+                // Process each time entry to determine attendance status
+                Times.map(Time => {
+                    let [hours, minutes] = Time.split(":").map(Number);
+
+                    //lecture 1
+                    if (hours === 8 && minutes >= 10 && minutes < 40) {
+                        td4.innerHTML = "<span class='present'>Present</span>";
+                    }
+                    else if (hours === 8 && minutes >= 40 && minutes < 60) {
+                        td4.innerHTML = "<span class='late'>Late</span>";
+                    }
+
+                    //lecture 2
+                    else if (hours === 9 && minutes >= 0 && minutes < 30) {
+                        td5.innerHTML = "<span class='present'>Present</span>";
+                    }
+                    else if (hours === 9 && minutes >= 30 && minutes < 50) {
+                        td5.innerHTML = "<span class='late'>Late</span>";
+                    }
+
+                    //lecture 3
+                    else if (hours === 9 && minutes >= 50) {
+                        td6.innerHTML = "<span class='present'>Present</span>";
+                    }
+                    else if (hours === 10 && minutes < 20) {
+                        td6.innerHTML = "<span class='present'>Present</span>";
+                    }
+                    else if (hours === 10 && minutes >= 20 && minutes < 40) {
+                        td6.innerHTML = "<span class='late'>Late</span>";
+                    }
+
+                    //lecture 4
+                    else if (hours === 10 && minutes >= 40) {
+                        td7.innerHTML = "<span class='present'>Present</span>";
+                    }
+                    else if (hours === 11 && minutes < 10) {
+                        td7.innerHTML = "<span class='present'>Present</span>";
+                    }
+                    else if (hours === 11 && minutes >= 10 && minutes < 30) {
+                        td7.innerHTML = "<span class='late'>Late</span>";
+                    }
+
+                    //lecture 5
+                    else if (hours === 12 && minutes >= 0 && minutes < 30) {
+                        td8.innerHTML = "<span class='present'>Present</span>";
+                    }
+                    else if (hours === 12 && minutes >= 30 && minutes < 50) {
+                        td8.innerHTML = "<span class='late'>Late</span>";
+                    }
+
+                    //lecture 6
+                    else if (hours === 12 && minutes >= 50) {
+                        td9.innerHTML = "<span class='present'>Present</span>";
+                    }
+                    else if (hours === 13 && minutes < 20) {
+                        td9.innerHTML = "<span class='present'>Present</span>";
+                    }
+                    else if (hours === 13 && minutes >= 20 && minutes < 40) {
+                        td9.innerHTML = "<span class='late'>Late</span>";
+                    }
+                });
+
+                trow.append(td1, td2, td3, td4, td5, td6, td7, td8, td9);
+                tbody1.append(trow);
+            }
+        }
+
+
+        const SearchEmpty = () => {
+            if (searchbar.value.length < 1)
+                AddAllRecordsGroupedByIDAndDate();
+        }
+
+        SelectAllDataRealtime();
+        searchbar1.addEventListener('input', () => {
+            FilterRecords();
+            SearchEmpty();
+        });
+        searchbar2.addEventListener('input', () => {
+            FilterRecords();
+            SearchEmpty();
+        });
+
+    </script>
+
+</body>
+
+</html>
